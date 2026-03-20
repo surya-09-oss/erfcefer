@@ -5,11 +5,10 @@ import { Volume2, VolumeX, Maximize, Minimize, Play, Pause, Loader2 } from "luci
 interface VideoPlayerProps {
   url: string;
   channelName: string;
-  channelLogo: string;
   onClose: () => void;
 }
 
-export default function VideoPlayer({ url, channelName, channelLogo, onClose }: VideoPlayerProps) {
+export default function VideoPlayer({ url, channelName, onClose }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<Hls | null>(null);
@@ -171,14 +170,9 @@ export default function VideoPlayer({ url, channelName, channelLogo, onClose }: 
             {/* Top bar */}
             <div className="flex items-center justify-between p-4 bg-gradient-to-b from-black/80 to-transparent pointer-events-auto">
               <div className="flex items-center gap-3">
-                <img
-                  src={channelLogo}
-                  alt={channelName}
-                  className="w-8 h-8 rounded object-contain bg-white/10"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23374151'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' fill='%239CA3AF' font-size='16'%3ETV%3C/text%3E%3C/svg%3E";
-                  }}
-                />
+                <div className="w-8 h-8 rounded bg-green-600 flex items-center justify-center">
+                  <Play className="w-4 h-4 text-white" />
+                </div>
                 <h3 className="text-white font-semibold text-lg truncate max-w-md">{channelName}</h3>
                 <span className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded animate-pulse">
                   LIVE
