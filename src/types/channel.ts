@@ -20,12 +20,12 @@ export interface Channel {
 
 export interface Stream {
   channel: string;
+  feed: string | null;
+  title: string;
   url: string;
-  http_referrer: string | null;
+  quality: string | null;
   user_agent: string | null;
-  status: string;
-  width: number;
-  height: number;
+  referrer: string | null;
 }
 
 export interface ChannelWithStream extends Channel {

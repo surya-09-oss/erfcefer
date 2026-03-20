@@ -14,19 +14,32 @@ export async function fetchStreams(): Promise<Stream[]> {
   return response.json();
 }
 
+function getQualityScore(quality: string | null): number {
+  if (!quality) return 0;
+  const match = quality.match(/(\d+)/);
+  return match ? parseInt(match[1], 10) : 0;
+}
+
+function pickBestStream(existing: Stream | undefined, candidate: Stream): Stream {
+  if (!existing) return candidate;
+  const existingScore = getQualityScore(existing.quality);
+  const candidateScore = getQualityScore(candidate.quality);
+  if (candidateScore > existingScore) return candidate;
+  if (existing.feed !== "HD" && candidate.feed === "HD") return candidate;
+  return existing;
+}
+
 export async function fetchSportsChannels(): Promise<ChannelWithStream[]> {
   const [channels, streams] = await Promise.all([
     fetchChannels(),
     fetchStreams(),
   ]);
 
+  // Build a map of channel ID -> best available stream, preferring HD / highest quality
   const streamMap = new Map<string, Stream>();
   for (const stream of streams) {
-    if (stream.status === "online" || stream.status === "timeout") {
-      if (!streamMap.has(stream.channel)) {
-        streamMap.set(stream.channel, stream);
-      }
-    }
+    const current = streamMap.get(stream.channel);
+    streamMap.set(stream.channel, pickBestStream(current, stream));
   }
 
   const sportsChannels = channels.filter(
@@ -41,7 +54,11 @@ export async function fetchSportsChannels(): Promise<ChannelWithStream[]> {
     stream: streamMap.get(ch.id) || null,
   }));
 
+  // Sort: Star Sports network first, then live channels, then Indian channels, then alphabetical
   channelsWithStreams.sort((a, b) => {
+    const aIsStarSports = a.network === "Star Sports" ? 1 : 0;
+    const bIsStarSports = b.network === "Star Sports" ? 1 : 0;
+    if (aIsStarSports !== bIsStarSports) return bIsStarSports - aIsStarSports;
     if (a.stream && !b.stream) return -1;
     if (!a.stream && b.stream) return 1;
     if (a.country === "IN" && b.country !== "IN") return -1;
