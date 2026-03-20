@@ -5,36 +5,26 @@ export interface Channel {
   network: string | null;
   owners: string[];
   country: string;
-  subdivision: string | null;
-  city: string | null;
-  broadcast_area: string[];
-  languages: string[];
   categories: string[];
   is_nsfw: boolean;
   launched: string | null;
   closed: string | null;
   replaced_by: string | null;
   website: string | null;
-  logo: string;
 }
 
 export interface Stream {
-  channel: string;
+  channel: string | null;
+  feed: string | null;
+  title: string;
   url: string;
-  http_referrer: string | null;
+  quality: string | null;
   user_agent: string | null;
-  status: string;
-  width: number;
-  height: number;
+  referrer: string | null;
 }
 
 export interface ChannelWithStream extends Channel {
   stream: Stream | null;
-}
-
-export interface Category {
-  id: string;
-  name: string;
 }
 
 export type FilterCountry = "all" | "IN" | "US" | "GB" | "AE" | "AU" | "OTHER";

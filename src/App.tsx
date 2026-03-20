@@ -13,7 +13,7 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCountry, setSelectedCountry] = useState<FilterCountry>("all");
-  const [showOnlyLive, setShowOnlyLive] = useState(true);
+  const [showOnlyLive, setShowOnlyLive] = useState(false);
   const [activeChannel, setActiveChannel] = useState<ChannelWithStream | null>(null);
 
   useEffect(() => {
@@ -174,7 +174,6 @@ function App() {
         <VideoPlayer
           url={activeChannel.stream.url}
           channelName={activeChannel.name}
-          channelLogo={activeChannel.logo}
           onClose={() => setActiveChannel(null)}
         />
       )}

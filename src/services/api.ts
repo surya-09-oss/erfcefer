@@ -20,12 +20,11 @@ export async function fetchSportsChannels(): Promise<ChannelWithStream[]> {
     fetchStreams(),
   ]);
 
+  // Build a map of channel ID -> stream (all streams are valid, no status filtering needed)
   const streamMap = new Map<string, Stream>();
   for (const stream of streams) {
-    if (stream.status === "online" || stream.status === "timeout") {
-      if (!streamMap.has(stream.channel)) {
-        streamMap.set(stream.channel, stream);
-      }
+    if (stream.channel && !streamMap.has(stream.channel)) {
+      streamMap.set(stream.channel, stream);
     }
   }
 
@@ -50,6 +49,10 @@ export async function fetchSportsChannels(): Promise<ChannelWithStream[]> {
   });
 
   return channelsWithStreams;
+}
+
+export function getChannelLogoUrl(channel: Channel): string {
+  return `https://raw.githubusercontent.com/nicnocquee/logos/main/tv/${channel.id}.png`;
 }
 
 export function getCountryName(code: string): string {

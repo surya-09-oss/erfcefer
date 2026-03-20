@@ -1,10 +1,19 @@
-import { Play, Wifi, WifiOff } from "lucide-react";
+import { Play, Wifi, WifiOff, Tv } from "lucide-react";
 import type { ChannelWithStream } from "../types/channel";
 import { getCountryName } from "../services/api";
 
 interface ChannelCardProps {
   channel: ChannelWithStream;
   onPlay: (channel: ChannelWithStream) => void;
+}
+
+function getInitials(name: string): string {
+  return name
+    .split(/[\s-]+/)
+    .slice(0, 3)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
 }
 
 export default function ChannelCard({ channel, onPlay }: ChannelCardProps) {
@@ -19,17 +28,14 @@ export default function ChannelCard({ channel, onPlay }: ChannelCardProps) {
       }`}
       onClick={() => hasStream && onPlay(channel)}
     >
-      {/* Channel Logo */}
+      {/* Channel Logo Area */}
       <div className="relative aspect-video bg-gray-900 flex items-center justify-center p-6">
-        <img
-          src={channel.logo}
-          alt={channel.name}
-          className="max-w-full max-h-full object-contain"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src =
-              "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 80'%3E%3Crect width='120' height='80' fill='%231f2937'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' fill='%236b7280' font-size='14' font-family='sans-serif'%3ENo Logo%3C/text%3E%3C/svg%3E";
-          }}
-        />
+        <div className="flex flex-col items-center justify-center gap-2">
+          <Tv className="w-10 h-10 text-gray-600" />
+          <span className="text-gray-400 font-bold text-lg tracking-wider">
+            {getInitials(channel.name)}
+          </span>
+        </div>
 
         {/* Play overlay */}
         {hasStream && (
@@ -55,7 +61,7 @@ export default function ChannelCard({ channel, onPlay }: ChannelCardProps) {
           )}
         </div>
 
-        {/* Country flag */}
+        {/* Country label */}
         <div className="absolute top-2 left-2">
           <span className="bg-gray-900/80 text-gray-300 text-xs px-2 py-1 rounded-full">
             {getCountryName(channel.country)}
@@ -71,13 +77,11 @@ export default function ChannelCard({ channel, onPlay }: ChannelCardProps) {
         {channel.network && (
           <p className="text-gray-400 text-xs mt-1 truncate">{channel.network}</p>
         )}
-        <div className="flex items-center gap-2 mt-2 flex-wrap">
-          {channel.languages.slice(0, 2).map((lang) => (
-            <span key={lang} className="bg-gray-700 text-gray-300 text-xs px-2 py-0.5 rounded">
-              {lang}
-            </span>
-          ))}
-        </div>
+        {channel.stream?.quality && (
+          <span className="inline-block mt-2 bg-gray-700 text-gray-300 text-xs px-2 py-0.5 rounded">
+            {channel.stream.quality}
+          </span>
+        )}
       </div>
     </div>
   );
