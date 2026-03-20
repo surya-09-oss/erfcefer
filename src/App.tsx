@@ -1,20 +1,19 @@
 import { useState, useEffect, useMemo } from "react";
 import { Loader2, AlertCircle, Radio } from "lucide-react";
 import { fetchSportsChannels } from "./services/api";
-import type { ChannelWithStream, FilterCountry } from "./types/channel";
+import type { Channel, FilterCountry } from "./types/channel";
 import Header from "./components/Header";
 import FilterBar from "./components/FilterBar";
 import ChannelCard from "./components/ChannelCard";
 import VideoPlayer from "./components/VideoPlayer";
 
 function App() {
-  const [channels, setChannels] = useState<ChannelWithStream[]>([]);
+  const [channels, setChannels] = useState<Channel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCountry, setSelectedCountry] = useState<FilterCountry>("all");
-  const [showOnlyLive, setShowOnlyLive] = useState(true);
-  const [activeChannel, setActiveChannel] = useState<ChannelWithStream | null>(null);
+  const [activeChannel, setActiveChannel] = useState<Channel | null>(null);
 
   useEffect(() => {
     loadChannels();
@@ -38,10 +37,6 @@ function App() {
   const filteredChannels = useMemo(() => {
     let filtered = channels;
 
-    if (showOnlyLive) {
-      filtered = filtered.filter((ch) => ch.stream !== null);
-    }
-
     if (selectedCountry !== "all") {
       if (selectedCountry === "OTHER") {
         const mainCountries = ["IN", "US", "GB", "AE", "AU"];
@@ -58,24 +53,16 @@ function App() {
       filtered = filtered.filter(
         (ch) =>
           ch.name.toLowerCase().includes(query) ||
-          (ch.network && ch.network.toLowerCase().includes(query)) ||
-          ch.country.toLowerCase().includes(query) ||
-          ch.alt_names.some((n) => n.toLowerCase().includes(query))
+          ch.group.toLowerCase().includes(query) ||
+          ch.country.toLowerCase().includes(query)
       );
     }
 
     return filtered;
-  }, [channels, searchQuery, selectedCountry, showOnlyLive]);
+  }, [channels, searchQuery, selectedCountry]);
 
-  const liveChannels = useMemo(
-    () => channels.filter((ch) => ch.stream !== null).length,
-    [channels]
-  );
-
-  const handlePlayChannel = (channel: ChannelWithStream) => {
-    if (channel.stream) {
-      setActiveChannel(channel);
-    }
+  const handlePlayChannel = (channel: Channel) => {
+    setActiveChannel(channel);
   };
 
   if (loading) {
@@ -119,14 +106,11 @@ function App() {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         totalChannels={channels.length}
-        liveChannels={liveChannels}
       />
 
       <FilterBar
         selectedCountry={selectedCountry}
         onCountryChange={setSelectedCountry}
-        showOnlyLive={showOnlyLive}
-        onToggleLive={() => setShowOnlyLive(!showOnlyLive)}
       />
 
       <main className="max-w-7xl mx-auto px-4 pb-8">
@@ -170,9 +154,9 @@ function App() {
         </div>
       </footer>
 
-      {activeChannel && activeChannel.stream && (
+      {activeChannel && (
         <VideoPlayer
-          url={activeChannel.stream.url}
+          url={activeChannel.url}
           channelName={activeChannel.name}
           channelLogo={activeChannel.logo}
           onClose={() => setActiveChannel(null)}

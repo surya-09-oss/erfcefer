@@ -4,14 +4,12 @@ interface HeaderProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   totalChannels: number;
-  liveChannels: number;
 }
 
 export default function Header({
   searchQuery,
   onSearchChange,
   totalChannels,
-  liveChannels,
 }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800">
@@ -27,7 +25,7 @@ export default function Header({
                 Sports<span className="text-green-500">Stream</span>
               </h1>
               <p className="text-xs text-gray-400">
-                {liveChannels} live of {totalChannels} channels
+                {totalChannels} channels available
               </p>
             </div>
           </div>
